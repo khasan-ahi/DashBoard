@@ -1,5 +1,6 @@
+import datetime
+
 from django.db import models
-from django.db.models import PositiveIntegerField, CharField
 from django.contrib.auth.models import User
 
 
@@ -9,7 +10,7 @@ class Category(models.Model):
     name = models.CharField('Название', max_length=100)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    def __str__(self) -> CharField:
+    def __str__(self) -> models.CharField:
         return self.name
 
     class Meta:
@@ -24,6 +25,7 @@ class Payment(models.Model):
         related_name='payments'
     )
     summa = models.PositiveIntegerField('Сумма')
+    data = models.DateField('Дата', default=datetime.datetime.now)
 
     class Meta:
         verbose_name = 'Платеж'
