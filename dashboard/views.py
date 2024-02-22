@@ -1,8 +1,8 @@
 from typing import Any
-
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, View, DetailView
 from django.db.models import Sum, QuerySet
+
 from dashboard.models import Category, Payment
 
 
@@ -53,4 +53,3 @@ class PaymentAddView(DetailView):
         payment = Payment(summa=summa, category_id=kwargs.get('pk'))
         payment.save()
         return redirect('home')
-
