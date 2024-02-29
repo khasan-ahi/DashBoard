@@ -22,6 +22,8 @@ class HomePageView(ListView):
         return queryset
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        if self.request.user.is_anonymous:
+            return
         context = super().get_context_data(**kwargs)
         total_sum = Category.objects.filter(
             author=self.request.user).aggregate(total_sum=Sum('payments__summa'))['total_sum']

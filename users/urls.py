@@ -1,11 +1,14 @@
-from django.urls import path, reverse_lazy
+from django.urls import path
 
-from users.views import MyLoginView
+from dashboard.views import HomePageView
+from users.views import MyLoginView, logout_view, registration
 from django.contrib.auth.views import LogoutView
 
 
 urlpatterns = [
+    # path('', HomePageView.as_view(), name='home'),
     path('login/', MyLoginView.as_view(), name='login'),
-    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+    path('logout/', logout_view, name='logout'),
+    path('registration/', registration, name='registration'),
 
 ]

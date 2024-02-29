@@ -61,8 +61,15 @@
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                    Рассходы</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_sum }} ₽</div>
+                                    Рассходы
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    {% if total_sum %}
+                                        {{ total_sum }} ₽
+                                    {% else %}
+                                    0р
+                                    {% endif %}
+                                </div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-solid fa-money-bill fa-2x text-gray-300"></i>
