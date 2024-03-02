@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Main Content -->
+<div id="content">
+    <div class="container">
+        <!-- Outer Row -->
+        <div class="row justify-content-center">
+
+            <div class="col-xl-10 col-lg-12 col-md-9">
+
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <!-- Nested Row within Card Body -->
+                        <div class="row justify-content-center">
+                            <div class="col-lg-6">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <h3 class="h4 text-gray-900 mb-4">Вы точно хотите удалить счет {{ check.name }}?</h3>
+                                    </div>
+
+                                    <form name="a" method="post" class="user">
+                                        {% csrf_token %}
+
+
+                                        <button type="submit" class="btn btn-danger btn-user btn-block">Удалить</button>
+                                        <a href="{% url 'home' %}" type="submit" class="btn btn-primary btn-user btn-block">Я передумал</a>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+<!-- End of Main Content -->
+{% endblock%}
