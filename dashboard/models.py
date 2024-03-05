@@ -4,7 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-# Create your models here.
+# Модель счета
 class Check(models.Model):
     name = models.CharField('Название', max_length=100)
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
@@ -38,6 +38,7 @@ class Category(models.Model):
         verbose_name_plural = 'Категории'
 
 
+# Модель рассходов
 class Payment(models.Model):
     category = models.ForeignKey(
         'Category',
@@ -64,6 +65,7 @@ class Payment(models.Model):
         verbose_name_plural = 'Рассходы'
 
 
+# Модель доходов
 class Income(models.Model):
     category = models.ForeignKey(
         'Category',

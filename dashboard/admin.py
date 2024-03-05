@@ -1,7 +1,7 @@
+from dashboard.models import Category, Payment, Check, Income
 from django.contrib import admin
 
 # Register your models here.
-from dashboard.models import Category, Payment, Check, Income
 
 admin.site.register(Category)
 admin.site.register(Payment)
