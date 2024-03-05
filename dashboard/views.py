@@ -38,6 +38,7 @@ class HomePageView(ListView):
     def get_queryset(self) -> QuerySet[Any]:
         if self.request.user.is_anonymous:
             return
+        # Общая сумма рассходов
         queryset = (Category.objects.filter(author=self.request.user)
                     .prefetch_related('payments')
                     .annotate(payments_sum=Sum('payments__summa')))
@@ -66,7 +67,7 @@ class HomePageView(ListView):
                           values('category__name', 'summa', 'data'))
         context['income_history'] = income_history
 
-        #
+        #Общая сумма доходов
         total_income_for_categories = (Category.objects.filter(author=self.request.user)
                                        .prefetch_related('incomes').annotate(incomes_sum=Sum('incomes__summa')))
         context['total_income_for_categories'] = total_income_for_categories
