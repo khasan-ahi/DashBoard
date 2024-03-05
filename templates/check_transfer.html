@@ -40,12 +40,14 @@
                                             <!-- Card Content - Collapse -->
                                             <div class="collapse show" id="collapseCardExample">
                                                 <div class="card-body">
-                                                    {% for check in checks %}
+                                                    {% for rcheck in checks %}
+                                                        {% if rcheck.currency == check.currency %}
                                                         <div>
-                                                            <input type="radio" name="radio_check" value="{{ check.id }}">
-                                                            <label class="pl-3">{{ check.name }}
+                                                            <input type="radio" name="radio_check" value="{{ rcheck.id }}" checked>
+                                                            <label class="pl-3">{{ rcheck.name }}
                                                             </label>
                                                         </div>
+                                                        {% endif %}
                                                     {% endfor %}
                                                 </div>
                                             </div>

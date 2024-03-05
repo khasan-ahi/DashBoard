@@ -13,6 +13,10 @@
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-800">Счета</h1>
+            <div>
+                <span id="USD">Доллар США $ — 00,0000 руб.</span><br>
+                <span id="EUR">Евро € — 00,0000 руб.</span>
+            </div>
         </div>
 
         <!-- Content Row -->
@@ -30,22 +34,31 @@
                                 </div>
                                 {% if check.money %}
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    {{ check.money }}₽
+                                    {{ check.money }}
+                                    {{ check.currency }}
+                                    {% if check.currency == 'USD' %}
+                                    <span class="text-xs">{{ check.money_in_rub }}RUB</span>
+                                    {% elif check.currency == 'EUR' %}
+                                    <span class="text-xs">{{ check.money_in_rub }}EUR</span>
+                                    {% endif %}
                                 </div>
                                 {% else %}
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    0 ₽
+                                    0
                                 </div>
+
                                 {% endif %}
                             </div>
 <!--                            Кнопки в счете-->
 
+                            {% if check.currency == 'RUB'%}
                             <div class="col-auto pl-1">
                                 <a href="{% url 'check_transfer' pk=check.pk %}"
                                    class="d-none d-sm-inline-block btn btn-sm btn-light shadow-sm" title="Перевод между счетами">
                                     <i class="fas fa-arrow-right fa-sm text-white-10"></i>
                                 </a>
                             </div>
+                            {% endif %}
                             <div class="col-auto pl-1">
                                 <a href="{% url 'check_update' pk=check.pk %}"
                                    class="d-none d-sm-inline-block btn btn-sm btn-light shadow-sm" title="Изменить счет">
@@ -84,23 +97,44 @@
                 <div class="card border-left-info shadow h-100 py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
+
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                <div class="font-weight-bold text-info text-uppercase mb-1">
                                     {{ category.name }}
                                 </div>
+
+
                                 {% if category.payments_sum %}
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    {{ category.payments_sum }}₽
+                                <div class="h5 mb-0 mt-3 text-gray-800">
+                                    <p class="text-danger">{{ category.payments_sum }}₽</p>
                                 </div>
                                 {% else %}
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
                                     0 ₽
                                 </div>
                                 {% endif %}
+
+                                {% for total in total_income_for_categories %}
+                                    {% if total == category%}
+                                        {% if total.incomes_sum %}
+                                        <div class="h5 mb-0 mt-3 text-gray-800 font-weight-bold ">
+                                            <p class="text-success">{{ total.incomes_sum }}₽</p>
+                                        </div>
+                                        {% else %}
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            0 ₽
+                                        </div>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+
                             </div>
                             <div class="col-auto">
-                                <a href="{% url 'payment_add' pk=category.pk %}" class="d-none d-sm-inline-block btn btn-sm btn-light shadow-sm">
-                                    <i class="fas fa-plus fa-sm text-white-10"></i>
+                                <a href="{% url 'payment_add' pk=category.pk %}" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" title="Добавить рассход">
+                                    <i class="fas fa-plus fa-sm text-white-10" ></i>
+                                </a>
+                                <a href="{% url 'income_add' pk=category.pk %}" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" title="Добавить доход">
+                                    <i class="fas fa-plus fa-sm text-white-10" ></i>
                                 </a>
                             </div>
                         </div>
@@ -129,8 +163,8 @@
                                     Рассходы
                                 </div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    {% if total_sum %}
-                                        {{ total_sum }} ₽
+                                    {% if payment_total_sum %}
+                                        {{ payment_total_sum }} ₽
                                     {% else %}
                                     0р
                                     {% endif %}
@@ -152,8 +186,8 @@
                                     Доходы
                                 </div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    {% if total_sum %}
-                                        {{ total_sum }} ₽
+                                    {% if income_total_sum %}
+                                        {{ income_total_sum }} ₽
                                     {% else %}
                                     0р
                                     {% endif %}
@@ -178,7 +212,7 @@
                 <!-- Illustrations -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">История</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">Рассходы</h6>
                     </div>
                     <div class="card-body">
                         {% for payment in payment_history %}
@@ -195,6 +229,38 @@
                                         </div>
                                         <div class="col-auto text-xs">
                                             <p>{{payment.data}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-lg-6 mb-4">
+
+                <!-- Illustrations -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Доходы</h6>
+                    </div>
+                    <div class="card-body">
+                        {% for income in income_history %}
+                            <div class="card shadow h-100 py-1 mb-1">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                <p>{{income.category__name}}</p>
+                                            </div>
+                                            <div class="h6 mb-0 font-weight-bold text-gray-800">
+                                                <p>{{income.summa}} ₽</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto text-xs">
+                                            <p>{{income.data}}</p>
                                         </div>
                                     </div>
                                 </div>
