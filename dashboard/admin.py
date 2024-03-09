@@ -7,4 +7,3 @@ admin.site.register(Category)
 admin.site.register(Payment)
 admin.site.register(Check)
 admin.site.register(Income)
-

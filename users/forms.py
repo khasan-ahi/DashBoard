@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 class MyUserCreationForm(UserCreationForm):
 
-    username = forms.CharField(label='adasd', min_length=5, max_length=150)
+    username = forms.CharField(label='Name', min_length=5, max_length=150)
 
     def __init__(self, *args, **kwargs):
         super(MyUserCreationForm, self).__init__(*args, **kwargs)

@@ -1,14 +1,15 @@
-from typing import Any
 import requests
+
+from typing import Any
+
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, View, DetailView
 from django.db.models import Sum, QuerySet
+from django.views.generic import ListView, View, DetailView
+
 import xml.etree.ElementTree as ET
 
 from dashboard.models import Category, Payment, Check, Income
 
-
-# Create your views here.
 
 def get_usd() -> float:
     usd_rate = float(
@@ -24,6 +25,27 @@ def get_eur() -> float:
         .find('./Valute[CharCode="EUR"]/Value')
         .text.replace(',', '.'))
     return eur_rate
+
+
+def get_payment_total_sum(user):
+    return Category.objects.filter(author=user).aggregate(payment_total_sum=Sum('payments__summa'))['payment_total_sum']
+
+
+def get_income_total_sum(user):
+    return Category.objects.filter(author=user).aggregate(income_total_sum=Sum('incomes__summa'))['income_total_sum']
+
+
+def get_payment_history(user):
+    return Payment.objects.filter(category__author=user).values('category__name', 'summa', 'data')
+
+
+def get_income_history(user):
+    return Income.objects.filter(category__author=user).values('category__name', 'summa', 'data')
+
+
+def get_total_income_for_categories(user):
+    return (Category.objects.filter(author=user).prefetch_related('incomes').
+            annotate(incomes_sum=Sum('incomes__summa')))
 
 
 class HomePageView(ListView):
@@ -45,31 +67,28 @@ class HomePageView(ListView):
         return queryset
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
         if self.request.user.is_anonymous:
             return
-        context = super().get_context_data(**kwargs)
+
         # Общая сумма рассходов
-        payment_total_sum = Category.objects.filter(
-            author=self.request.user).aggregate(payment_total_sum=Sum('payments__summa'))['payment_total_sum']
+        payment_total_sum = get_payment_total_sum(self.request.user)
         context['payment_total_sum'] = payment_total_sum
 
         # Общая сумма доходов
-        income_total_sum = Category.objects.filter(
-            author=self.request.user).aggregate(income_total_sum=Sum('incomes__summa'))['income_total_sum']
+        income_total_sum = get_income_total_sum(self.request.user)
         context['income_total_sum'] = income_total_sum
 
         # История платежей
-        payment_history = (Payment.objects.filter(category__author=self.request.user).
-                           values('category__name', 'summa', 'data'))
+        payment_history = get_payment_history(self.request.user)
         context['payment_history'] = payment_history
 
-        income_history = (Income.objects.filter(category__author=self.request.user).
-                          values('category__name', 'summa', 'data'))
+        income_history = get_income_history(self.request.user)
         context['income_history'] = income_history
 
         #Общая сумма доходов
-        total_income_for_categories = (Category.objects.filter(author=self.request.user)
-                                       .prefetch_related('incomes').annotate(incomes_sum=Sum('incomes__summa')))
+        total_income_for_categories = get_total_income_for_categories(self.request.user)
         context['total_income_for_categories'] = total_income_for_categories
 
         checks = Check.objects.filter(author=self.request.user)
@@ -116,6 +135,7 @@ class PaymentAddView(DetailView):
             check.money = check.money_in_rub / get_eur()
         else:
             check.money -= int(summa)
+
         check.save()
 
         payment = Payment(summa=summa, category_id=kwargs.get('pk'), payment_check=check, is_payment=True)
@@ -143,7 +163,6 @@ class IncomeAddView(DetailView):
             return redirect('home')
 
         check = Check.objects.get(id=check_id)
-
         if check and check.money_in_rub <= int(summa):
             return redirect('home')
 
@@ -204,6 +223,7 @@ class CheckUpdateView (DetailView):
         check_name = request.POST.get('check')
         money = request.POST.get('money')
         check = Check.objects.filter(id=kwargs.get('pk')).update(name=check_name, money=money)
+        check.save()
 
         return redirect('home')
 

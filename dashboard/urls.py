@@ -1,9 +1,10 @@
+from django.urls import path
 from dashboard.views import (HomePageView, CategoryAddView,
                              PaymentAddView, IncomeAddView,
                              CheckAddView,
                              CheckDeleteView, CheckUpdateView,
                              CheckTransferView)
-from django.urls import path
+
 
 urlpatterns = [
     path('', HomePageView.as_view(), name='home'),

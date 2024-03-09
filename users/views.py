@@ -1,11 +1,9 @@
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.views import LoginView
-from django.contrib.auth import logout
-from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import render, redirect
+from django.contrib.auth import logout, login, authenticate
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.views import LoginView
 
 from users.forms import MyUserCreationForm
 
@@ -27,11 +25,14 @@ def registration(request):
         form = MyUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
+
             # получаем имя пользователя и пароль из формы
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password1')
+
             # выполняем аутентификацию
             user = authenticate(username=username, password=password)
+            # выполняем вход
             login(request, user)
             return redirect('home')
     else:
@@ -42,5 +43,3 @@ def registration(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
-
-
