@@ -222,8 +222,7 @@ class CheckUpdateView (DetailView):
     def post(self, request, *args, **kwargs):
         check_name = request.POST.get('check')
         money = request.POST.get('money')
-        check = Check.objects.filter(id=kwargs.get('pk')).update(name=check_name, money=money)
-        check.save()
+        Check.objects.filter(id=kwargs.get('pk')).update(name=check_name, money=money)
 
         return redirect('home')
 
